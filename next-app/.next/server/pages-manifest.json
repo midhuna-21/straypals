@@ -1,8 +1,6 @@
 {
   "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/report": "pages/report.js",
-  "/map": "pages/map.js",
-  "/admin/cms-copy": "pages/admin/cms-copy.js"
+  "/_error": "pages/_error.js",
+  "/": "pages/index.js"
 }
