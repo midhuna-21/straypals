@@ -1,0 +1,68 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function hasRole() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles hasAny ['mod','ngo_admin','superadmin']);
+    }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid) || hasRole();
+      allow write: if isOwner(uid) || hasRole();
+      match /fcmTokens/{token} {
+        allow read, write: if isOwner(uid) || hasRole();
+      }
+    }
+
+    match /stations/{id} {
+      allow read: if true;
+      allow write: if hasRole();
+    }
+    match /stationsSecure/{id} {
+      allow read, write: if hasRole();
+    }
+    match /stationCoverQueue/{id} {
+      allow read: if hasRole();
+      allow create: if isSignedIn();
+      allow update, delete: if hasRole();
+    }
+
+    match /schedules/{id} {
+      allow read: if true;
+      allow create, update, delete: if hasRole();
+    }
+
+    match /dogReports/{id} {
+      allow read: if resource.data.visibility == 'public' || hasRole() || isOwner(resource.data.createdBy);
+      allow create: if isSignedIn();
+      allow update, delete: if hasRole() || isOwner(resource.data.createdBy);
+    }
+    match /dogReportsSecure/{id} {
+      allow read, write: if hasRole();
+    }
+
+    match /referrals/{id} {
+      allow read: if hasRole() || (isSignedIn() && resource.data.referrerUid == request.auth.uid);
+      allow write: if false;
+    }
+    match /referralAgg/{id} {
+      allow read: if hasRole() || (isSignedIn() && request.auth.uid == id);
+      allow write: if false;
+    }
+
+    match /appCopy/{lang} {
+      allow read: if true;
+      allow write: if hasRole();
+    }
+
+    match /sosAlerts/{id} {
+      allow read: if hasRole() || (isSignedIn() && resource.data.createdBy == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update, delete: if hasRole();
+    }
+  }
+}

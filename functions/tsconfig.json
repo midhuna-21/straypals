@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "es2020"
+    ],
+    "module": "commonjs",
+    "noImplicitAny": false,
+
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true, 
+    "outDir": "lib",
+    "sourceMap": true,
+    "target": "es2020"
+  },
+  "compileOnSave": true,
+  "include": [
+    "index.ts"
+  ]
+  
+}

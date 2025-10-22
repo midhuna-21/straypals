@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST="{\"components\\\\Header.tsx -> ./LoginWidget\":{\"id\":\"components\\\\Header.tsx -> ./LoginWidget\",\"files\":[\"static/chunks/src_components_LoginWidget_tsx.js\"]}}"

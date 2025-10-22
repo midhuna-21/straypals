@@ -1,0 +1,18 @@
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() { return request.auth != null; }
+    match /public/{allPaths=**} {
+      allow read: if true;
+      allow write: if false; // Functions write with admin privileges
+    }
+    match /uploads/{uid}/{allPaths=**} {
+      allow read: if isSignedIn() && re
+      quest.auth.uid == uid;
+      allow write: if isSignedIn() && request.auth.uid == uid
+                   && request.resource.size < 10 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+  }
+}
