@@ -45,203 +45,55 @@ export default function Home() {
       }}
     >
       {/* ---------------- HERO SECTION ---------------- */}
-    <section
-      style={{
-        width: "100vw",
-        marginLeft: "calc(50% - 50vw)",
-        padding: "0",
-        marginBottom: "24px",
-        overflow: "hidden",
-        position: "relative",
-      }}
-    >
-      <div className="hero-grid">
-        {/* LEFT CONTENT */}
-        <div className="hero-content">
-          <h1>Because every stray deserves a friend</h1>
-          <p>
-            Join thousands of animal lovers making a difference — one bowl at a
-            time. Report local strays, find feeding stations, and coordinate care
-            with your community.
-          </p>
+      <section
+        style={{
+          width: "100vw",
+          marginLeft: "calc(50% - 50vw)",
+          padding: "0",
+          marginBottom: "24px",
+          overflow: "hidden",
+          position: "relative",
+        }}
+      >
+        <div className="hero-grid">
+          {/* LEFT CONTENT */}
+          <div className="hero-content">
+            <h1>Because every stray deserves a friend</h1>
+            <p>
+              Join thousands of animal lovers making a difference — one bowl at a
+              time. Report local strays, find feeding stations, and coordinate care
+              with your community.
+            </p>
 
-          <div className="cta-buttons">
-            <Link href="/report" className="primary-btn">
-              <span style={{ fontSize: "18px" }}>🐾</span> Report a Stray
-            </Link>
+            <div className="cta-buttons">
+              <Link href="/report" className="primary-btn">
+                <span style={{ fontSize: "18px" }}>🐾</span> Report a Stray
+              </Link>
 
-            <Link href="/map" className="secondary-btn">
-              <MapPin size={18} strokeWidth={2} /> Find Stations Near You
-            </Link>
+              <Link href="/map" className="secondary-btn">
+                <MapPin size={18} strokeWidth={2} /> Find Stations Near You
+              </Link>
+            </div>
+          </div>
+
+          {/* RIGHT IMAGE */}
+          <div className="hero-image">
+            <div className="overlay"></div>
+            <img
+              src="/images/dog-paw-takes-man.webp"
+              alt="Dog and human connection"
+            />
           </div>
         </div>
-
-        {/* RIGHT IMAGE */}
-        <div className="hero-image">
-          <div className="overlay"></div>
-          <img
-            src="/images/dog-paw-takes-man.webp"
-            alt="Dog and human connection"
-          />
-        </div>
-      </div>
-
-      {/* RESPONSIVE STYLES */}
-      <style jsx>{`
-        .hero-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          align-items: center;
-          min-height: 500px;
-          gap: 40px;
-        }
-
-        .hero-content {
-          padding: 48px;
-          z-index: 2;
-          max-width: 700px;
-          margin: 0 auto;
-        }
-
-        .hero-content h1 {
-          margin: 0 0 20px 0;
-          font-size: 44px;
-          line-height: 1.2;
-          font-weight: 700;
-          color: #ffffff;
-          letter-spacing: -0.02em;
-        }
-
-        .hero-content p {
-          margin: 0 0 36px 0;
-          color: #9fb3c8;
-          font-size: 18px;
-          line-height: 1.7;
-          font-weight: 400;
-        }
-
-        .cta-buttons {
-          display: flex;
-          gap: 16px;
-          flex-wrap: wrap;
-        }
-
-        .primary-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 10px;
-          padding: 14px 28px;
-          font-size: 16px;
-          font-weight: 600;
-          color: #ffffff;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-          border: none;
-          border-radius: 10px;
-          text-decoration: none;
-          cursor: pointer;
-          box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .primary-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
-        }
-
-        .secondary-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 10px;
-          padding: 14px 28px;
-          font-size: 16px;
-          font-weight: 600;
-          color: #ffffff;
-          background: transparent;
-          border: 2px solid rgba(255, 255, 255, 0.2);
-          border-radius: 10px;
-          text-decoration: none;
-          cursor: pointer;
-          backdrop-filter: blur(10px);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .secondary-btn:hover {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: rgba(255, 255, 255, 0.3);
-          transform: translateY(-2px);
-        }
-
-        .hero-image {
-          position: relative;
-          height: 100%;
-          min-height: 500px;
-          overflow: hidden;
-        }
-
-        .hero-image img {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: center;
-        }
-
-        .overlay {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            #0b1117 0%,
-            rgba(11, 17, 23, 0.7) 50%,
-            transparent 100%
-          );
-          z-index: 1;
-        }
-
-        /* ✅ MOBILE RESPONSIVENESS */
-        @media (max-width: 768px) {
-          .hero-grid {
-            grid-template-columns: 1fr;
-            gap: 0;
-          }
-
-          .hero-image {
-            order: 1;
-            min-height: 300px;
-          }
-
-          .hero-content {
-            order: 2;
-            padding: 24px;
-            text-align: center;
-          }
-
-          .hero-content h1 {
-            font-size: 28px;
-          }
-
-          .hero-content p {
-            font-size: 16px;
-          }
-
-          .cta-buttons {
-            justify-content: center;
-          }
-        }
-      `}</style>
-    </section>
+      </section>
 
       {/* ---------------- HOW IT WORKS SECTION ---------------- */}
-      <section >
+      <section style={{padding:'20px'}}>
         {/* Background pattern */}
         <div
           style={{
             position: "absolute",
+            
             top: 0,
             left: 0,
             right: 0,
@@ -453,45 +305,6 @@ export default function Home() {
             );
           })}
         </div>
-        
-     <style jsx>{`
-  /* Steps grid is already responsive with auto-fit */
-  @media (max-width: 768px) {
-    /* Section header */
-    h2 {
-      font-size: 24px !important; /* smaller than desktop 36px */
-    }
-
-    p {
-      font-size: 14px !important; /* smaller than desktop 18px */
-    }
-
-    /* Step card */
-    h3 {
-      font-size: 18px !important; /* smaller than desktop 22px */
-    }
-
-    p {
-      font-size: 13px !important; /* smaller than desktop 15px */
-    }
-
-    .hero-grid {
-      gap: 20px !important;
-    }
-
-    /* Optional: make step icons smaller */
-    div[style*="width: 56px"][style*="height: 56px"] {
-      width: 48px !important;
-      height: 48px !important;
-    }
-
-    svg {
-      width: 24px !important;
-      height: 24px !important;
-    }
-  }
-`}</style>
-
       </section>
     </main>
   );
