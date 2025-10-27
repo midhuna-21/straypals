@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Menu, X, ChevronDown, Building2, Shield, BarChart3, TrendingUp, FileEdit, Bell, LogIn } from 'lucide-react';
+import LoginWidget from './LoginWidget';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -157,7 +158,8 @@ export default function Header() {
               <Bell size={16} />
               <span>Enable Alerts</span>
             </button>
-            <button style={{
+            <LoginWidget/>
+            {/* <button style={{
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
@@ -173,7 +175,8 @@ export default function Header() {
             }}>
               <LogIn size={16} />
               <span>Sign In</span>
-            </button>
+                <LoginWidget/>
+            </button> */}
           </div>
 
           {/* Mobile Menu Button */}
