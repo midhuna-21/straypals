@@ -17,11 +17,11 @@ a {
 }
 
 .card {
-    background: #0f1720;
-    border: 1px solid #1e293b;
-    border-radius: 16px;
-    padding: 20px;
-    margin: 0 0 16px 0
+    /* background: #0f1720; */
+    /* border: 1px solid #1e293b; */
+    /* border-radius: 16px; */
+    /* padding: 20px; */
+    /* margin: 0 0 16px 0 */
 }
 
 .grid2 {
@@ -301,4 +301,24 @@ header {
         width: 24px !important;
         height: 24px !important;
     }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
