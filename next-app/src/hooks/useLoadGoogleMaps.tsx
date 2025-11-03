@@ -6,7 +6,6 @@ export default function GooglePlacesAutocomplete({ onSelect }) {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    // Load Google script dynamically (frontend only)
     const existingScript = document.getElementById('googleMaps');
     if (!existingScript) {
       const script = document.createElement('script');
@@ -22,8 +21,8 @@ export default function GooglePlacesAutocomplete({ onSelect }) {
     function initAutocomplete() {
       if (!window.google) return;
       const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
-        types: ['geocode'], // You can use ['(cities)'] for city-only
-        componentRestrictions: { country: 'in' }, // restrict to India
+        types: ['geocode'], 
+        componentRestrictions: { country: 'in' }, 
       });
 
       autocomplete.addListener('place_changed', () => {
@@ -40,10 +39,13 @@ export default function GooglePlacesAutocomplete({ onSelect }) {
       placeholder="Search for a location..."
       style={{
         width: '100%',
-        padding: '10px',
-        borderRadius: '6px',
-        border: '1px solid #ccc',
-        fontSize: '16px',
+        flex: 1,
+                  padding: "14px 18px",
+                  background: "rgba(15, 23, 42, 0.6)",
+                  fontSize: "16px",
+                  color: "#ffffff",
+                  outline: "none",
+                  transition: "all 0.3s ease",
       }}
     />
   );
