@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export default function GooglePlacesAutocomplete({ onSelect }) {
+  const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
     const existingScript = document.getElementById('googleMaps');
+
     if (!existingScript) {
       const script = document.createElement('script');
       script.id = 'googleMaps';
@@ -21,8 +23,8 @@ export default function GooglePlacesAutocomplete({ onSelect }) {
     function initAutocomplete() {
       if (!window.google) return;
       const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
-        types: ['geocode'], 
-        componentRestrictions: { country: 'in' }, 
+        types: ['geocode'],
+        componentRestrictions: { country: 'in' },
       });
 
       autocomplete.addListener('place_changed', () => {
@@ -36,17 +38,26 @@ export default function GooglePlacesAutocomplete({ onSelect }) {
     <input
       ref={inputRef}
       type="text"
+      className="small-placeholder"
       placeholder="Search for a location..."
+      required
       style={{
         width: '100%',
         flex: 1,
-                  padding: "14px 18px",
-                  background: "rgba(15, 23, 42, 0.6)",
-                  fontSize: "16px",
-                  color: "#ffffff",
-                  outline: "none",
-                  transition: "all 0.3s ease",
+        padding: '14px 18px',
+        background: 'rgba(15, 23, 42, 0.6)',
+        border: isFocused
+          ? '1px solid #10b981'
+          : '1px solid rgba(71, 85, 105, 0.5)',
+        borderRadius: '12px',
+        fontSize: '16px',
+        color: '#ffffff',
+        outline: 'none',
+        transition: 'all 0.3s ease',
+        boxSizing: 'border-box',
       }}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
     />
   );
 }

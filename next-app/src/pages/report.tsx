@@ -16,7 +16,7 @@ export default function ReportPage() {
   const [photoPreview, setPhotoPreview] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const [isFocused, setIsFocused] = useState(false);
 
   const [hoveredButton, setHoveredButton] = useState(null);
 
@@ -211,63 +211,39 @@ export default function ReportPage() {
               }}>
                 <Heart size={14} style={{ color: "#f59e0b" }} />
               </div>
-              <span>What would you like to call them?</span>
+              <span>Who’s this lovely soul?</span>
             </label>
 
             <div style={{ width: '100%' }}>
               {/* Pet name input */}
               <input
                 type="text"
-                placeholder="e.g., Fluffy, Buddy, Spot..."
+                className="small-placeholder"
+                placeholder="e.g., Lucky, Bella, Scout..."
                 style={{
                   width: '100%',
                   padding: '14px 18px',
                   background: 'rgba(15, 23, 42, 0.6)',
-                  // border: '1px solid rgba(71, 85, 105, 0.5)',
-                  // borderRadius: '12px',
+                  border: isFocused ? '1px solid #10b981' : '1px solid rgba(71, 85, 105, 0.5)',
+                  borderRadius: '12px',
                   fontSize: '16px',
                   color: '#ffffff',
                   outline: 'none',
                   transition: 'all 0.3s ease',
                   boxSizing: 'border-box',
                 }}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
               />
             </div>
-            {/* <input
-              type="text"
-              value={petName}
-              onChange={(e) => setPetName(e.target.value)}
-              placeholder="e.g., Fluffy, Buddy, Spot..."
-              style={{
-                
-        width: '100%',
-        flex: 1,
-                  padding: "14px 18px",
-                  background: "rgba(15, 23, 42, 0.6)",
-                  fontSize: "16px",
-                  color: "#ffffff",
-                  outline: "none",
-                  transition: "all 0.3s ease",
-    
-                border: "1px solid rgba(71, 85, 105, 0.5)",
-                borderRadius: "12px", 
-              }}
-              onFocus={(e) => {
-                e.target.style.border = "1px solid #10b981";
-                e.target.style.background = "rgba(15, 23, 42, 0.8)";
-              }}
-              onBlur={(e) => {
-                e.target.style.border = "1px solid rgba(71, 85, 105, 0.5)";
-                e.target.style.background = "rgba(15, 23, 42, 0.6)";
-              }}
-            /> */}
+
             <p style={{
               marginTop: "8px",
               fontSize: "13px",
               color: "#64748b",
               fontStyle: "italic",
             }}>
-              A name makes them real, makes them matter
+              A name makes them real, makes them home
             </p>
           </div>
 
@@ -323,7 +299,7 @@ export default function ReportPage() {
                 />
                 <Upload size={40} style={{ color: "#64748b", marginBottom: "12px" }} />
                 <p style={{ margin: 0, fontSize: "16px", color: "#cbd5e1", marginBottom: "4px" }}>
-                  Click to upload or drag and drop
+                  Click to upload
                 </p>
                 <p style={{ margin: 0, fontSize: "13px", color: "#64748b" }}>
                   A picture speaks a thousand words
@@ -441,7 +417,7 @@ export default function ReportPage() {
               e.currentTarget.style.boxShadow = "0 4px 20px rgba(16, 185, 129, 0.3)";
             }}
           >
-            🐾 Help This Stray Find Care
+            Share to Care
           </button>
 
           {/* Encouraging Message */}
@@ -459,8 +435,8 @@ export default function ReportPage() {
               color: "#cbd5e1",
               lineHeight: "1.6",
             }}>
-              💚 Your kindness matters. By reporting this stray, you're connecting them with
-              local volunteers who can provide food, medical care, and maybe even a forever home.
+              💚 Your kindness matters. Now, you're connecting them with
+              people who can provide food, medical care, and maybe even a forever home.
             </p>
           </div>
         </div>
