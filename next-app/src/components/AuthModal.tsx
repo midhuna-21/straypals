@@ -1,68 +1,70 @@
 import { useEffect, useState } from 'react'
-  import { auth } from '../lib/firebase'
-  import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth'
-  import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-  import { db } from "../lib/firebase";
+import { auth } from '../lib/firebase'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../lib/firebase";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
-  type Props = { open: boolean, onClose: () => void }
+type Props = { open: boolean, onClose: () => void }
 
-  export default function AuthModal({ open, onClose }: Props) {
-    const [mode, setMode] = useState<'signin' | 'signup'>('signin')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [name, setName] = useState('')
-    const [busy, setBusy] = useState(false)
-    const [err, setErr] = useState('')
+export default function AuthModal({ open, onClose }: Props) {
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+  const [showPassword, setShowPassword] = useState(false);
 
-    if (!open) return null
+  if (!open) return null
 
-    async function submit(e: any) {
-      e.preventDefault();
-      setErr('');
-      setBusy(true);
+  async function submit(e: any) {
+    e.preventDefault();
+    setErr('');
+    setBusy(true);
 
-      try {
-        if (mode === 'signup') {
-          const cred = await createUserWithEmailAndPassword(auth, email, password);
-          if (name) await updateProfile(cred.user, { displayName: name });
+    try {
+      if (mode === 'signup') {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        if (name) await updateProfile(cred.user, { displayName: name });
 
-          await setDoc(doc(db, 'users', cred.user.uid), {
-            uid: cred.user.uid,
-            name: name,
-            email: email,
-            password: password,
-            createdAt: serverTimestamp(),
-          });
-        } else {
-          await signInWithEmailAndPassword(auth, email, password);
-        }
-
-        onClose();
-      } catch (e: any) {
-        setErr(e?.message || 'Authentication failed');
-      } finally {
-        setBusy(false);
+        await setDoc(doc(db, 'users', cred.user.uid), {
+          uid: cred.user.uid,
+          name: name,
+          email: email,
+          password: password,
+          createdAt: serverTimestamp(),
+        });
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
       }
-    }
 
-    useEffect(() => {
-  if (open) {
-    // disable scroll
-    document.body.style.overflow = 'hidden';
-  } else {
-    // enable scroll
-    document.body.style.overflow = '';
+      onClose();
+    } catch (e: any) {
+      setErr(e?.message || 'Authentication failed');
+    } finally {
+      setBusy(false);
+    }
   }
 
-  // cleanup when modal unmounts
-  return () => {
-    document.body.style.overflow = '';
-  };
-}, [open]);
+  useEffect(() => {
+    if (open) {
+      // disable scroll
+      document.body.style.overflow = 'hidden';
+    } else {
+      // enable scroll
+      document.body.style.overflow = '';
+    }
 
-    return (
-      <>
-        <style>{`
+    // cleanup when modal unmounts
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
+  return (
+    <>
+      <style>{`
           @keyframes slideInRight {
             from {
               transform: translateX(100%);
@@ -183,101 +185,82 @@ import { useEffect, useState } from 'react'
           }
         `}</style>
 
+      <div
+        style={{
+          position: 'fixed',
+          right: 0,
+          top: 0,
+          height: '100vh',
+          width: '100vw',
+          zIndex: 1000,
+          display: 'flex',
+          justifyContent: 'flex-end',
+          background: 'rgba(15, 23, 42, 0.6)',
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.3s ease-out'
+        }}
+        onClick={onClose}
+      >
         <div
           style={{
-            position: 'fixed',
-            right: 0,
-            top: 0,
-            height: '100vh',
-            width: '100vw',
-            zIndex: 1000,
-            display: 'flex',
-            justifyContent: 'flex-end',
-            background: 'rgba(15, 23, 42, 0.6)',
-            backdropFilter: 'blur(4px)',
-            animation: 'fadeIn 0.3s ease-out'
+            width: '480px',
+            maxWidth: '100vw',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            animation: 'slideInRight 0.4s ease-out',
+            boxShadow: '-10px 0 40px rgba(0, 0, 0, 0.3)',
+            position: 'relative',
           }}
-          onClick={onClose}
+          onClick={e => e.stopPropagation()}
         >
-          <div
-            style={{
-              width: '480px',
-              maxWidth: '100vw',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              animation: 'slideInRight 0.4s ease-out',
-              boxShadow: '-10px 0 40px rgba(0, 0, 0, 0.3)',
-              position: 'relative',
-            }}
-            onClick={e => e.stopPropagation()}
-          >
+          <div style={{
+            background: 'white',
+            minHeight: '100vh',
+            padding: '60px 40px',
+            position: 'relative'
+          }}>
+            {/* Decorative blobs */}
             <div style={{
-              background: 'white',
-              minHeight: '100vh',
-              padding: '60px 40px',
-              position: 'relative'
+              position: 'absolute',
+              width: '300px',
+              height: '300px',
+              borderRadius: '50%',
+              background: '#667eea',
+              top: '-100px',
+              right: '-100px',
+              filter: 'blur(60px)',
+              opacity: 0.15,
+              pointerEvents: 'none'
+            }}></div>
+
+
+            <button className="close-btn" onClick={onClose}>×</button>
+
+
+
+            <h2 style={{
+              marginTop: 0,
+              marginBottom: 8,
+              fontSize: 28,
+              fontWeight: 700,
+              textAlign: 'center',
+              color: '#0f172a',
+              letterSpacing: '-0.02em'
             }}>
-              {/* Decorative blobs */}
-              <div style={{
-                position: 'absolute',
-                width: '300px',
-                height: '300px',
-                borderRadius: '50%',
-                background: '#667eea',
-                top: '-100px',
-                right: '-100px',
-                filter: 'blur(60px)',
-                opacity: 0.15,
-                pointerEvents: 'none'
-              }}></div>
-    
+              {mode === 'signup' ? 'Create your account' : 'Back to help?'}
+            </h2>
 
-              <button className="close-btn" onClick={onClose}>×</button>
+            <p style={{
+              marginTop: 0,
+              marginBottom: 40,
+              fontSize: 15,
+              color: '#64748b',
+              textAlign: 'center'
+            }}>
+              {mode === 'signup' ? 'Sign up to get started with us' : 'Continue spreading kindness'}
+            </p>
 
-
-
-              <h2 style={{
-                marginTop: 0,
-                marginBottom: 8,
-                fontSize: 28,
-                fontWeight: 700,
-                textAlign: 'center',
-                color: '#0f172a',
-                letterSpacing: '-0.02em'
-              }}>
-                {mode === 'signup' ? 'Create your account' : 'Back to help?'}
-              </h2>
-
-              <p style={{
-                marginTop: 0,
-                marginBottom: 40,
-                fontSize: 15,
-                color: '#64748b',
-                textAlign: 'center'
-              }}>
-                {mode === 'signup' ? 'Sign up to get started with us' : 'Continue spreading kindness'}
-              </p>
-
-              <form onSubmit={submit}>
-                {mode === 'signup' && (
-                  <div style={{ marginBottom: 20 }}>
-                    <label style={{
-                      display: 'block',
-                      marginBottom: 8,
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: '#334155'
-                    }}>
-                      Full Name
-                    </label>
-                    <input
-                      className="auth-input"
-                      placeholder=""
-                      value={name}
-                      onChange={e => setName(e.target.value)}
-                    />
-                  </div>
-                )}
-
+            <form onSubmit={submit}>
+              {mode === 'signup' && (
                 <div style={{ marginBottom: 20 }}>
                   <label style={{
                     display: 'block',
@@ -286,19 +269,90 @@ import { useEffect, useState } from 'react'
                     fontWeight: 600,
                     color: '#334155'
                   }}>
-                    Email Address
+                    Full Name
                   </label>
                   <input
                     className="auth-input"
-                    type="email"
                     placeholder=""
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
+                    value={name}
+                    onChange={e => setName(e.target.value)}
                   />
                 </div>
+              )}
 
-                <div style={{ marginBottom: 24 }}>
+              <div style={{ marginBottom: 20 }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: 8,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: '#334155'
+                }}>
+                  Email Address
+                </label>
+                <input
+                  className="auth-input"
+                  type="email"
+                  placeholder=""
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+     <div style={{ marginBottom: 24, position: "relative" }}>
+  <label
+    style={{
+      display: "block",
+      marginBottom: 8,
+      fontSize: 14,
+      fontWeight: 600,
+      color: "#334155",
+    }}
+  >
+    Password
+  </label>
+
+  <input
+    className="auth-input"
+    type={showPassword ? "text" : "password"}
+    placeholder="••••••••"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    required
+    style={{
+      paddingRight: "42px", // 👈 space for the icon
+    }}
+  />
+
+  <button
+    type="button"
+    onClick={() => setShowPassword((prev) => !prev)}
+    style={{
+      position: "absolute",
+      right: "12px",
+      top: "42px",
+      background: "transparent",
+      border: "none",
+      cursor: "pointer",
+      color: "#64748b",
+      padding: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+    aria-label={showPassword ? "Hide password" : "Show password"}
+  >
+    {showPassword ? (
+      <FiEyeOff size={18} />
+    ) : (
+      <FiEye size={18} />
+    )}
+  </button>
+</div>
+
+
+              {/* <div style={{ marginBottom: 24 }}>
                   <label style={{
                     display: 'block',
                     marginBottom: 8,
@@ -316,59 +370,59 @@ import { useEffect, useState } from 'react'
                     onChange={e => setPassword(e.target.value)}
                     required
                   />
+                </div> */}
+
+              {err && (
+                <div style={{
+                  padding: '12px 16px',
+                  marginBottom: 20,
+                  background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+                  color: '#dc2626',
+                  fontSize: 14,
+                  borderRadius: 8,
+                  borderLeft: '4px solid #dc2626',
+                  animation: 'fadeIn 0.3s ease-out'
+                }}>
+                  {err}
                 </div>
+              )}
 
-                {err && (
-                  <div style={{
-                    padding: '12px 16px',
-                    marginBottom: 20,
-                    background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-                    color: '#dc2626',
-                    fontSize: 14,
-                    borderRadius: 8,
-                    borderLeft: '4px solid #dc2626',
-                    animation: 'fadeIn 0.3s ease-out'
-                  }}>
-                    {err}
-                  </div>
-                )}
+              <button
+                className="btn-primary"
+                type="submit"
+                disabled={busy}
+              >
+                {busy ? 'Please wait…' : (mode === 'signup' ? 'Create account' : 'Sign in')}
+              </button>
 
-                <button
-                  className="btn-primary"
-                  type="submit"
-                  disabled={busy}
-                >
-                  {busy ? 'Please wait…' : (mode === 'signup' ? 'Create account' : 'Sign in')}
-                </button>
+              <button
+                className="btn-secondary"
+                type="button"
+                onClick={onClose}
+              >
+                Cancel
+              </button>
+            </form>
 
-                <button
-                  className="btn-secondary"
-                  type="button"
-                  onClick={onClose}
-                >
-                  Cancel
-                </button>
-              </form>
-
-              <div style={{
-                marginTop: 32,
-                // paddingTop: 32,
-                // borderTop: '2px solid #f1f5f9',
-                textAlign: 'center',
-                fontSize: 14,
-                color: '#64748b'
-              }}>
-                {mode === 'signup' ? 'Already have an account?' : "Don't have an account?"}{' '}
-                <span
-                  className="link-text"
-                  onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')}
-                >
-                  {mode === 'signup' ? 'Sign in' : 'Sign up'}
-                </span>
-              </div>
+            <div style={{
+              marginTop: 32,
+              // paddingTop: 32,
+              // borderTop: '2px solid #f1f5f9',
+              textAlign: 'center',
+              fontSize: 14,
+              color: '#64748b'
+            }}>
+              {mode === 'signup' ? 'Already have an account?' : "Don't have an account?"}{' '}
+              <span
+                className="link-text"
+                onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')}
+              >
+                {mode === 'signup' ? 'Sign in' : 'Sign up'}
+              </span>
             </div>
           </div>
         </div>
-      </>
-    )
-  }
+      </div>
+    </>
+  )
+}

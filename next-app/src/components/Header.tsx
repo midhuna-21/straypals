@@ -56,7 +56,8 @@ export default function Header() {
           }} className="desktop-nav">
             <NavLink href="/">Home</NavLink>
             <NavLink href="/report">Report</NavLink>
-            <NavLink href="/map">Map</NavLink>
+            <NavLink href="/spotted">Spotted</NavLink>
+            {/* <NavLink href="/map">Map</NavLink> */}
             <NavLink href="/tasks">Tasks</NavLink>
             <NavLink href="/sos">SOS</NavLink>
             <NavLink href="/posters">Posters</NavLink>
