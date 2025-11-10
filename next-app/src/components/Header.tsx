@@ -58,11 +58,12 @@ export default function Header() {
             <NavLink href="/report">Report</NavLink>
             <NavLink href="/spotted">Spotted</NavLink>
             {/* <NavLink href="/map">Map</NavLink> */}
+            <NavLink href="/community">Community</NavLink>
             <NavLink href="/tasks">Tasks</NavLink>
-            <NavLink href="/sos">SOS</NavLink>
-            <NavLink href="/posters">Posters</NavLink>
-            <NavLink href="/campaign/pass-the-bowl">Pass the Bowl</NavLink>
-            <NavLink href="/me">Profile</NavLink>
+            {/* <NavLink href="/sos">SOS</NavLink> */}
+            {/* <NavLink href="/posters">Posters</NavLink> */}
+            <NavLink href="/pass-the-bowl">Pass the Bowl</NavLink>
+            {/* <NavLink href="/me">Profile</NavLink> */}
 
             {/* Divider */}
             <div style={{
@@ -125,11 +126,12 @@ export default function Header() {
                   paddingBottom: '0.75rem',
                   overflow: 'hidden'
                 }}>
-                  <DropdownLink href="/admin/stations" icon={<Building2 size={16} />}>Feeding Stations</DropdownLink>
-                  <DropdownLink href="/admin/moderation-covers" icon={<Shield size={16} />}>Moderation</DropdownLink>
-                  <DropdownLink href="/admin/stations-dashboard" icon={<BarChart3 size={16} />}>Dashboard</DropdownLink>
-                  <DropdownLink href="/admin/referrals-analytics" icon={<TrendingUp size={16} />}>Referrals</DropdownLink>
-                  <DropdownLink href="/admin/cms-copy" icon={<FileEdit size={16} />}>CMS</DropdownLink>
+                  <DropdownLink href="/stations" icon={<Building2 size={16} />}>Feeding Stations</DropdownLink>
+                  {/* <DropdownLink href="/community" icon={<Shield size={16} />}>Tasks</DropdownLink> */}
+                  <DropdownLink href="/tasks" icon={<Shield size={16} />}>Tasks</DropdownLink>
+                  <DropdownLink href="/dashboard" icon={<BarChart3 size={16} />}>Dashboard</DropdownLink>
+                  {/* <DropdownLink href="/admin/referrals-analytics" icon={<TrendingUp size={16} />}>Referrals</DropdownLink>
+                  <DropdownLink href="/admin/cms-copy" icon={<FileEdit size={16} />}>CMS</DropdownLink> */}
                 </div>
               )}
             </div>
@@ -213,7 +215,7 @@ export default function Header() {
               <MobileNavLink href="/tasks" icon=''>Tasks</MobileNavLink>
               <MobileNavLink href="/sos" icon=''>SOS</MobileNavLink>
               <MobileNavLink href="/posters" icon=''>Posters</MobileNavLink>
-              <MobileNavLink href="/campaign/pass-the-bowl" icon=''>Pass the Bowl</MobileNavLink>
+              <MobileNavLink href="/pass-the-bowl" icon=''>Pass the Bowl</MobileNavLink>
               <MobileNavLink href="/me" icon=''>Profile</MobileNavLink>
 
               <div style={{
