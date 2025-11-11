@@ -2,6 +2,9 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
+  "/dashboard": "pages/dashboard.js",
+  "/community": "pages/community.js",
+  "/": "pages/index.js",
   "/pass-the-bowl": "pages/pass-the-bowl.js",
-  "/": "pages/index.js"
+  "/tasks": "pages/tasks.js"
 }

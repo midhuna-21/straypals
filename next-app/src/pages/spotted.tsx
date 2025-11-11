@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { MapPin, Clock, Heart, Navigation } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { db } from "../lib/firebase";
 import { collection, getDocs, doc, getDoc, orderBy, query } from "firebase/firestore";
 
@@ -10,13 +11,13 @@ interface Pet {
     location?: string;
     photoURL?: string;
     createdAt?: { seconds: number };
-    userId?: string; // 👈 important
+    userId?: string;
 }
 
 export default function SpottedPage() {
     const [reports, setReports] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const router = useRouter();
 
     useEffect(() => {
         const fetchReports = async () => {
@@ -452,6 +453,15 @@ export default function SpottedPage() {
                                         boxShadow: "0 4px 14px rgba(16, 185, 129, 0.25)",
                                         letterSpacing: "0.02em"
                                     }}
+                                    onClick={() => {
+                                        if (item.location) {
+                                            // encode location for URL
+                                            const encodedLocation = encodeURIComponent(item.location);
+                                            window.open(`https://www.google.com/maps/search/?api=1&query=${encodedLocation}`, "_blank");
+                                        } else {
+                                            alert("Location not available");
+                                        }
+                                    }}
                                     onMouseEnter={(e) => {
                                         e.currentTarget.style.transform = "translateY(-2px)";
                                         e.currentTarget.style.boxShadow = "0 8px 24px rgba(16, 185, 129, 0.4)";
@@ -464,6 +474,38 @@ export default function SpottedPage() {
                                     <Navigation size={18} />
                                     Get Directions
                                 </button>
+
+                                {/* <button
+                                    style={{
+                                        width: "100%",
+                                        background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                                        color: "#000",
+                                        border: "none",
+                                        borderRadius: "14px",
+                                        padding: "16px 24px",
+                                        fontSize: "15px",
+                                        fontWeight: "700",
+                                        cursor: "pointer",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        gap: "10px",
+                                        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                        boxShadow: "0 4px 14px rgba(16, 185, 129, 0.25)",
+                                        letterSpacing: "0.02em"
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = "translateY(-2px)";
+                                        e.currentTarget.style.boxShadow = "0 8px 24px rgba(16, 185, 129, 0.4)";
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = "translateY(0)";
+                                        e.currentTarget.style.boxShadow = "0 4px 14px rgba(16, 185, 129, 0.25)";
+                                    }}
+                                >
+                                    <Navigation size={18} />
+                                    Get Directions
+                                </button> */}
                             </div>
                         </div>
                     ))}
@@ -491,6 +533,7 @@ export default function SpottedPage() {
                             Report it now and help your community take action
                         </p>
                         <button
+
                             style={{
                                 background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
                                 color: "#000",
@@ -502,6 +545,7 @@ export default function SpottedPage() {
                                 cursor: "pointer",
                                 transition: "all 0.3s ease"
                             }}
+                            onClick={() => router.push("/report")}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.transform = "scale(1.05)";
                             }}

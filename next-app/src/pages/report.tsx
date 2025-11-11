@@ -7,10 +7,9 @@ import { db, storage, auth } from "../lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged } from "firebase/auth";
-import LoginWidget from "../components/LoginWidget"; // ✅ import your login modal
+import LoginWidget from "../components/LoginWidget"; 
 import AuthModal from "../components/AuthModal";
 
-// ✅ Define types
 interface FormErrors {
   petName?: string;
   photo?: string;
@@ -31,11 +30,20 @@ export default function ReportPage() {
   const [petName, setPetName] = useState<string>("");
   const [petPhoto, setPetPhoto] = useState<File | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<SelectedLocation | null>(null);
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState<boolean>(false);
-  const [errors, setErrors] = useState<FormErrors>({});
 
-  // ✅ Listen for auth changes
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  useEffect(() => {
+    if (showSuccessModal) {
+      const timer = setTimeout(() => setShowSuccessModal(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessModal]);
+
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
     return () => unsubscribe();
@@ -84,10 +92,52 @@ export default function ReportPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   // ✅ Open AuthModal instead of LoginWidget
+  //   if (!user) {
+  //     setShowAuthModal(true);
+  //     return;
+  //   }
+
+  //   if (!validateFields()) return;
+
+  //   try {
+  //     setLoading(true);
+  //     const storageRef = ref(storage, `pets/${Date.now()}_${petPhoto?.name}`);
+  //     await uploadBytes(storageRef, petPhoto!);
+  //     const photoURL = await getDownloadURL(storageRef);
+
+  //     await addDoc(collection(db, "pets"), {
+  //       name: petName,
+  //       photoURL,
+  //       location: selectedLocation?.address,
+  //       coordinates: {
+  //         lat: selectedLocation?.lat,
+  //         lng: selectedLocation?.lng,
+  //       },
+  //       createdAt: serverTimestamp(),
+  //       userId: user.uid,
+  //     });
+
+  //     alert("🐾 Pet info saved successfully!");
+  //     setPetName("");
+  //     setPetPhoto(null);
+  //     setImage(null);
+  //     setSelectedLocation(null);
+  //     setErrors({});
+  //   } catch (err: any) {
+  //     console.error("Error saving pet data:", err);
+  //     alert("Error saving data: " + err.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // ✅ Open AuthModal instead of LoginWidget
     if (!user) {
       setShowAuthModal(true);
       return;
@@ -112,8 +162,7 @@ export default function ReportPage() {
         createdAt: serverTimestamp(),
         userId: user.uid,
       });
-
-      alert("🐾 Pet info saved successfully!");
+      setShowSuccessModal(true);
       setPetName("");
       setPetPhoto(null);
       setImage(null);
@@ -434,7 +483,91 @@ export default function ReportPage() {
             {loading ? "Saving..." : "Share to Care"}
           </button>
         </form>
+
       </div>
+
+      {showSuccessModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            animation: "fadeIn 0.3s ease-in-out",
+          }}
+        >
+          <div
+            style={{
+              background: "rgba(30, 41, 59, 0.9)",
+              border: "1px solid rgba(51, 65, 85, 0.6)",
+              borderRadius: "16px",
+              padding: "30px 40px",
+              textAlign: "center",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+              backdropFilter: "blur(10px)",
+              animation: "slideUp 0.3s ease-out",
+            }}
+          >
+            <div
+              style={{
+                width: "60px",
+                height: "60px",
+                margin: "0 auto 16px",
+                borderRadius: "50%",
+                background: "rgba(16, 185, 129, 0.15)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="#10b981"
+                stroke="none"
+                style={{ width: "34px", height: "34px" }}
+              >
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 
+           4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 
+           14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 
+           6.86-8.55 11.54L12 21.35z" />
+              </svg>
+
+            </div>
+
+            <h2
+              style={{
+                color: "#f1f5f9",
+                fontSize: "20px",
+                fontWeight: 600,
+                marginBottom: "8px",
+              }}
+            >
+              Much love!
+            </h2>
+            <p
+              style={{
+                color: "#94a3b8",
+                fontSize: "15px",
+                lineHeight: "1.5",
+                maxWidth: "280px",
+                margin: "0 auto",
+              }}
+            >
+              Look at you! Making the world a better place for furry friends.
+            </p>
+          </div>
+        </div>
+      )}
+
+
+
     </div>
+
+
   );
 }
+
