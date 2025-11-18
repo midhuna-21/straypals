@@ -1,243 +1,167 @@
-'use client';
+import React from "react";
+import { PieChart, Pie, Tooltip, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
+import { useEffect, useState } from "react";
+import { getDocs, collection, query, where } from "firebase/firestore";
+import { db } from "../lib/firebase";
 
-import { 
-  TrendingUp, TrendingDown, Users, MapPin, Heart, 
-  AlertTriangle, Clock, PawPrint
-} from 'lucide-react';
-import { useState } from 'react';
+export default function Dashboard() {
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalStrayReported, setTotalStrayReported] = useState(0);
+  const [totalStrayReportedByYou, setTotalStrayReportedByYou] = useState(0);
+  const [totalAccepted, setTotalAccepted] = useState(0);
+  const [totalDeclined, setTotalDeclined] = useState(0);
 
-export default function StrayCareDashboard() {
-  const [timeRange, setTimeRange] = useState('7d');
-
-  const stats = [
-    { title: 'Active Stations', value: 247, change: 12, icon: <MapPin color="#3b82f6" />, trend: 'up' },
-    { title: 'Volunteers', value: 1834, change: 8, icon: <Users color="#22c55e" />, trend: 'up' },
-    { title: 'Strays Needing Help', value: 892, change: -5, icon: <AlertTriangle color="#ef4444" />, trend: 'down' },
-    { title: 'Strays Helped (MTD)', value: 3421, change: 15, icon: <Heart color="#f59e0b" />, trend: 'up' },
+  const reportData = [
+    { name: "Reported", value: totalStrayReported },
+    { name: "Not Reported", value: totalUsers - totalStrayReported },
   ];
 
-  return (
-    <div className="dashboard">
-      <div className="dashboard-header">
-        <h1>🐾 Stray Care Dashboard</h1>
-        <div className="time-selector">
-          {['24h', '7d', '30d'].map((range) => (
-            <button
-              key={range}
-              className={`time-btn ${timeRange === range ? 'active' : ''}`}
-              onClick={() => setTimeRange(range)}
-            >
-              {range.toUpperCase()}
-            </button>
-          ))}
-        </div>
-      </div>
+  const personalReportData = [
+    { name: "You Reported", value: totalStrayReportedByYou },
+    { name: "Others", value: totalStrayReported - totalStrayReportedByYou },
+  ];
 
-      <div className="metrics-grid">
-        {stats.map((stat, i) => (
-          <div key={i} className="metric-card">
-            <div className="metric-header">
-              <div className="metric-icon">{stat.icon}</div>
-              <div className={`trend-badge ${stat.trend}`}>
-                {stat.trend === 'up' ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                {Math.abs(stat.change)}%
-              </div>
-            </div>
-            <div className="metric-value">{stat.value.toLocaleString()}</div>
-            <div className="metric-label">{stat.title}</div>
+  const trendData = [
+    { month: "Jan", reports: 20 },
+    { month: "Feb", reports: 35 },
+    { month: "Mar", reports: 28 },
+    { month: "Apr", reports: 50 },
+    { month: "May", reports: 60 },
+  ];
+
+  const smallCard = {
+    background: "#1f1f1f",
+    padding: "10px 15px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "1px solid #333",
+    color: "#fff",
+    minWidth: "120px",
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userId = localStorage.getItem("uid");
+
+        // Total users
+        const usersSnap = await getDocs(collection(db, "users"));
+        setTotalUsers(usersSnap.size);
+
+        // Total strays
+        const reportSnap = await getDocs(collection(db, "pets"));
+        setTotalStrayReported(reportSnap.size);
+
+        // Strays reported by the logged user
+        // const qUserReports = query(collection(db, "pets"), where("userId", "==", userId));
+        const qUserReports = query(collection(db, "pets"), where("userId", "==", userId));
+
+        
+        
+        const userReportsSnap = await getDocs(qUserReports);
+        console.log(userReportsSnap.size,'userReportsSnap')
+        setTotalStrayReportedByYou(userReportsSnap.size);
+
+        // Requests Accepted
+        const qAccepted = query(collection(db, "request"), where("userId", "==", userId), where("status", "==", "accepted"));
+        const acceptedSnap = await getDocs(qAccepted);
+        setTotalAccepted(acceptedSnap.size);
+
+        // Requests Declined
+        const qDeclined = query(collection(db, "request"), where("userId", "==", userId), where("status", "==", "declined"));
+        const declinedSnap = await getDocs(qDeclined);
+        setTotalDeclined(declinedSnap.size);
+      } catch (err) {
+        console.error("Error fetching dashboard data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  return (
+    <div style={{ padding: "20px", fontFamily: "Arial", color: "#fff", background: "#0d0f14", minHeight: "100vh" }}>
+      <h2 style={{ marginBottom: "15px", fontSize: "24px", fontWeight: 600 }}>Dashboard Overview</h2>
+
+      {/* SMALL ONE-LINE STATS */}
+      <div style={{ display: "flex", gap: "10px", flexWrap: "nowrap", overflowX: "auto" }}>
+        {[{
+          title: "Total Users",
+          value: totalUsers,
+        }, {
+          title: "Total Strays",
+          value: totalStrayReported,
+        }, {
+          title: "You Reported",
+          value: totalStrayReportedByYou,
+        }, {
+          title: "Accepted",
+          value: totalAccepted,
+        }, {
+          title: "Declined",
+          value: totalDeclined,
+        }].map((card, idx) => (
+          <div key={idx} >
+            <span style={{ fontWeight: "600", opacity: 0.8 }}>{card.title}</span>
+            <span style={{ fontSize: "18px", fontWeight: "bold" }}>{card.value}</span>
           </div>
         ))}
       </div>
 
-      <div className="activity-section">
-        <h2>Recent Activity</h2>
-        <div className="activity-list">
-          <div className="activity-item">
-            <PawPrint size={18} color="#3b82f6" />
-            <span>Rescued 3 dogs near Central Park</span>
-            <span className="time"><Clock size={12} /> 10m ago</span>
+      {/* TWO PIE CHARTS IN ONE ROW + GRAPH ON RIGHT */}
+      <div style={{ marginTop: "25px", display: "flex", gap: "20px" }}>
+
+        {/* LEFT: TWO PIE CHARTS SIDE BY SIDE */}
+        <div style={{ flex: 1, border: "1px solid #333", borderRadius: "10px", padding: "10px", background: "#15171d" }}>
+          <h4 style={{ marginBottom: "10px" }}>Reports Summary</h4>
+
+          <div style={{ display: "flex", gap: "10px" }}>
+            <div style={{ flex: 1, textAlign: "center" }}>
+              <span style={{ fontSize: "14px", fontWeight: 600 }}>All Users</span>
+              <div style={{ width: "100%", height: "160px" }}>
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie data={reportData} dataKey="value" nameKey="name" outerRadius={55} fill="#ffb74d" />
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div style={{ flex: 1, textAlign: "center" }}>
+              <span style={{ fontSize: "14px", fontWeight: 600 }}>Your Contribution</span>
+              <div style={{ width: "100%", height: "160px" }}>
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie data={personalReportData} dataKey="value" nameKey="name" outerRadius={55} fill="#64b5f6" />
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           </div>
-          <div className="activity-item">
-            <Heart size={18} color="#f59e0b" />
-            <span>2 strays adopted from Queens</span>
-            <span className="time"><Clock size={12} /> 1h ago</span>
-          </div>
-          <div className="activity-item">
-            <Users size={18} color="#22c55e" />
-            <span>New volunteer joined Bronx team</span>
-            <span className="time"><Clock size={12} /> 2h ago</span>
+        </div>
+
+        {/* RIGHT GRAPH SMALLER */}
+        <div style={{ flex: 1.2, border: "1px solid #333", borderRadius: "10px", padding: "10px", background: "#15171d" }}>
+          <h4 style={{ marginBottom: "10px" }}>Monthly Reporting Trend</h4>
+          <div style={{ width: "100%", height: "260px" }}>
+            <ResponsiveContainer>
+              <LineChart data={trendData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                <XAxis dataKey="month" stroke="#ccc" />
+                <YAxis stroke="#ccc" />
+                <Tooltip />
+                <Line type="monotone" dataKey="reports" stroke="#ffa726" strokeWidth={2} dot={{ r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .dashboard {
-          min-height: 100vh;
-          background: #0a0a0a;
-          color: #f9fafb;
-          padding: 32px 24px;
-          font-family: 'Roboto', sans-serif;
-        }
-
-        .dashboard-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 32px;
-        }
-
-        h1 {
-          font-size: 28px;
-          font-weight: 700;
-          color: #ffffff;
-        }
-
-        .time-selector {
-          display: flex;
-          gap: 8px;
-          background: #1f1f1f;
-          padding: 4px;
-          border-radius: 8px;
-        }
-
-        .time-btn {
-          padding: 8px 16px;
-          border: none;
-          background: transparent;
-          color: #9ca3af;
-          font-size: 14px;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-
-        .time-btn.active {
-          background: #2563eb;
-          color: white;
-        }
-
-        .metrics-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 20px;
-          margin-bottom: 40px;
-        }
-
-        .metric-card {
-          background: #111;
-          padding: 20px;
-          border-radius: 12px;
-          border: 1px solid #1f2937;
-          transition: 0.3s;
-        }
-
-        .metric-card:hover {
-          transform: translateY(-2px);
-          border-color: #2563eb;
-        }
-
-        .metric-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 12px;
-        }
-
-        .metric-icon {
-          background: #1f1f1f;
-          padding: 10px;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .trend-badge {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          padding: 4px 8px;
-          border-radius: 6px;
-          font-size: 12px;
-          font-weight: 600;
-        }
-
-        .trend-badge.up {
-          background: #064e3b;
-          color: #34d399;
-        }
-
-        .trend-badge.down {
-          background: #7f1d1d;
-          color: #fca5a5;
-        }
-
-        .metric-value {
-          font-size: 30px;
-          font-weight: 700;
-          color: #fff;
-        }
-
-        .metric-label {
-          font-size: 13px;
-          color: #9ca3af;
-        }
-
-        .activity-section {
-          background: #111;
-          border-radius: 12px;
-          padding: 24px;
-          border: 1px solid #1f2937;
-        }
-
-        .activity-section h2 {
-          font-size: 18px;
-          margin-bottom: 16px;
-          color: #f3f4f6;
-        }
-
-        .activity-list {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .activity-item {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          background: #1a1a1a;
-          padding: 12px 16px;
-          border-radius: 8px;
-          border: 1px solid #1f2937;
-          color: #d1d5db;
-          font-size: 14px;
-        }
-
-        .activity-item span {
-          flex: 1;
-          margin-left: 10px;
-        }
-
-        .time {
-          font-size: 12px;
-          color: #9ca3af;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        @media (max-width: 768px) {
-          .dashboard-header {
-            flex-direction: column;
-            gap: 12px;
-            align-items: flex-start;
-          }
-          .metrics-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
     </div>
   );
 }

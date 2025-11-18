@@ -37,26 +37,55 @@ const CSP_PROD = [
 
 const csp = process.env.NODE_ENV === 'production' ? CSP_PROD : CSP_DEV
 
+// const nextConfig = {
+//   reactStrictMode: false,
+//     output: 'export',
+//   async headers() {
+//     const reportTo = JSON.stringify({
+//       group: 'csp-endpoint',
+//       max_age: 10886400,
+//       endpoints: [{ url: CSP_REPORT_URI }]
+//     })
+//     return [{
+//       source: '/:path*',
+//       headers: [
+//         { key: 'Content-Security-Policy-Report-Only', value: `${csp}; report-uri ${CSP_REPORT_URI}; report-to csp-endpoint` },
+//         { key: 'Report-To', value: reportTo },
+//         { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+//         { key: 'X-Content-Type-Options', value: 'nosniff' },
+//         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+//         { key: 'Permissions-Policy', value: "geolocation=(self), camera=(), microphone=(), clipboard-read=(self), clipboard-write=(self), notifications=(self)" },
+//         { key: 'X-Frame-Options', value: 'DENY' }
+//       ]
+//     }]
+//   }
+// }
+// module.exports = nextConfig
+
 const nextConfig = {
   reactStrictMode: false,
   async headers() {
     const reportTo = JSON.stringify({
       group: 'csp-endpoint',
       max_age: 10886400,
-      endpoints: [{ url: CSP_REPORT_URI }]
-    })
-    return [{
-      source: '/:path*',
-      headers: [
-        { key: 'Content-Security-Policy-Report-Only', value: `${csp}; report-uri ${CSP_REPORT_URI}; report-to csp-endpoint` },
-        { key: 'Report-To', value: reportTo },
-        { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
-        { key: 'X-Content-Type-Options', value: 'nosniff' },
-        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-        { key: 'Permissions-Policy', value: "geolocation=(self), camera=(), microphone=(), clipboard-read=(self), clipboard-write=(self), notifications=(self)" },
-        { key: 'X-Frame-Options', value: 'DENY' }
-      ]
-    }]
-  }
-}
-module.exports = nextConfig
+      endpoints: [{ url: CSP_REPORT_URI }],
+    });
+
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'Content-Security-Policy-Report-Only', value: `${csp}; report-uri ${CSP_REPORT_URI}; report-to csp-endpoint` },
+          { key: 'Report-To', value: reportTo },
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: "geolocation=(self), camera=(), microphone=(), clipboard-read=(self), clipboard-write=(self), notifications=(self)" },
+          { key: 'X-Frame-Options', value: 'DENY' },
+        ],
+      },
+    ];
+  },
+};
+
+module.exports = nextConfig;

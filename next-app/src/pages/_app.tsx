@@ -30,8 +30,7 @@ export default function App({ Component, pageProps }: AppProps) {
     return () => unsub()
   }, [router])
   return (<>
-    <Header />
-    <div className="container"><Component {...pageProps} /></div>
+    <div className=""><Component {...pageProps} /></div>
     <div className="footer"><div className="container">© StrayPals v15.4</div></div>
   </>)
 }

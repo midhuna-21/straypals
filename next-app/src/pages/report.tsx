@@ -7,8 +7,9 @@ import { db, storage, auth } from "../lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged } from "firebase/auth";
-import LoginWidget from "../components/LoginWidget"; 
+import LoginWidget from "../components/LoginWidget";
 import AuthModal from "../components/AuthModal";
+import Header from "../components/Header";
 
 interface FormErrors {
   petName?: string;
@@ -43,19 +44,21 @@ export default function ReportPage() {
     }
   }, [showSuccessModal]);
 
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
     return () => unsubscribe();
   }, []);
 
-  // ✅ Close login modal after login
   useEffect(() => {
     if (user && showLoginModal) setShowLoginModal(false);
   }, [user, showLoginModal]);
 
+  const handleSelectLocation = (place: any) => {
+    console.log("User selected location:", place);
+  };
+
   const handleSelect = (place: any) => {
-    if (place.geometry && place.geometry.location) {
+    if (place?.geometry && place.geometry.location) {
       setSelectedLocation({
         address: place.formatted_address,
         lat: place.geometry.location.lat(),
@@ -91,49 +94,6 @@ export default function ReportPage() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-
-  //   // ✅ Open AuthModal instead of LoginWidget
-  //   if (!user) {
-  //     setShowAuthModal(true);
-  //     return;
-  //   }
-
-  //   if (!validateFields()) return;
-
-  //   try {
-  //     setLoading(true);
-  //     const storageRef = ref(storage, `pets/${Date.now()}_${petPhoto?.name}`);
-  //     await uploadBytes(storageRef, petPhoto!);
-  //     const photoURL = await getDownloadURL(storageRef);
-
-  //     await addDoc(collection(db, "pets"), {
-  //       name: petName,
-  //       photoURL,
-  //       location: selectedLocation?.address,
-  //       coordinates: {
-  //         lat: selectedLocation?.lat,
-  //         lng: selectedLocation?.lng,
-  //       },
-  //       createdAt: serverTimestamp(),
-  //       userId: user.uid,
-  //     });
-
-  //     alert("🐾 Pet info saved successfully!");
-  //     setPetName("");
-  //     setPetPhoto(null);
-  //     setImage(null);
-  //     setSelectedLocation(null);
-  //     setErrors({});
-  //   } catch (err: any) {
-  //     console.error("Error saving pet data:", err);
-  //     alert("Error saving data: " + err.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,17 +136,30 @@ export default function ReportPage() {
     }
   };
 
+  // === NEW: single container style used across the page ===
+  const CONTAINER_STYLE: React.CSSProperties = {
+    maxWidth: "1200px",      // change once to affect whole page alignment
+    padding: "70px 55px",       // left/right gutter
+    margin: "0 auto",
+    boxSizing: "border-box",
+    width: "100%",
+  };
+
   return (
-    <div
+    <div>
+         <Header/>
+            <div
       style={{
         minHeight: "100vh",
-        padding: "40px 20px",
+        padding: "40px 0",
         fontFamily:
           '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         position: "relative",
+        background: "#000",
       }}
     >
-      {/* ✅ Login Modal */}
+   
+      {/* AUTH MODAL */}
       {showAuthModal && (
         <div
           style={{
@@ -201,12 +174,12 @@ export default function ReportPage() {
           onClick={() => setShowAuthModal(false)}
         >
           <div onClick={(e) => e.stopPropagation()}>
-            <AuthModal open={showAuthModal} onClose={() => setShowAuthModal(false)} />
+            <AuthModal open={showAuthModal} onClose={() => setShowAuthModal(false)} onSelect={handleSelectLocation} />
           </div>
         </div>
       )}
 
-      {/* Background pattern */}
+      {/* subtle dot texture (global) */}
       <div
         style={{
           position: "fixed",
@@ -218,356 +191,173 @@ export default function ReportPage() {
         }}
       />
 
-      <div style={{ maxWidth: "700px", margin: "0 auto", position: "relative", zIndex: 1 }}>
-        {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: "48px" }}>
-          <div
-            style={{
-              display: "inline-block",
-              padding: "10px 20px",
-              background: "rgba(16, 185, 129, 0.1)",
-              border: "1px solid rgba(16, 185, 129, 0.3)",
-              borderRadius: "30px",
-              marginBottom: "20px",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "14px",
-                fontWeight: 600,
-                color: "#10b981",
-                textTransform: "uppercase",
-              }}
-            >
-              🐾 Let’s do something for the strays, yeah?
-            </span>
-          </div>
-
-          <h1
-            style={{
-              fontSize: "40px",
-              fontWeight: 700,
-              color: "#ffffff",
-              marginBottom: "16px",
-            }}
-          >
-            They’re smiling ‘cause of you.
-          </h1>
-          <p
-            style={{
-              fontSize: "18px",
-              color: "#94a3b8",
-              maxWidth: "600px",
-              margin: "0 auto",
-              lineHeight: "1.6",
-            }}
-          >
-            You turned a lonely moment into hope — that’s enough to make a difference.
-          </p>
-        </div>
-
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            background: "rgba(30, 41, 59, 0.6)",
-            border: "1px solid rgba(51, 65, 85, 0.6)",
-            borderRadius: "20px",
-            padding: "40px",
-            backdropFilter: "blur(10px)",
-          }}
-        >
-          {/* Pet Name */}
-          <div style={{ marginBottom: "32px" }}>
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                marginBottom: "14px",
-                fontSize: "15px",
-                fontWeight: 600,
-                color: "#f1f5f9",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "24px",
-                  height: "24px",
-                  borderRadius: "6px",
-                  background: "rgba(245, 158, 11, 0.15)",
-                }}
-              >
-                <Heart size={14} style={{ color: "#f59e0b" }} />
-              </div>
-              <span>Who’s this lovely soul?</span>
-            </label>
-
-            <input
-              type="text"
-              value={petName}
-              onChange={(e) => {
-                setPetName(e.target.value);
-                if (errors.petName) setErrors((prev) => ({ ...prev, petName: "" }));
-              }}
-              placeholder="e.g., Lucky, Bella, Scout..."
-              style={{
-                width: "100%",
-                padding: "14px 18px",
-                background: "rgba(15, 23, 42, 0.6)",
-                border: errors.petName
-                  ? "1px solid #ef4444"
-                  : isFocused
-                    ? "1px solid #10b981"
-                    : "1px solid rgba(71, 85, 105, 0.5)",
-                borderRadius: "12px",
-                fontSize: "16px",
-                color: "#ffffff",
-                outline: "none",
-                transition: "all 0.3s ease",
-              }}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-            />
-            {errors.petName && (
-              <p style={{ color: "#ef4444", fontSize: "13px", marginTop: "8px" }}>
-                {errors.petName}
-              </p>
-            )}
-          </div>
-
-          {/* Photo Upload */}
-          <div style={{ marginBottom: "32px" }}>
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                marginBottom: "14px",
-                fontSize: "15px",
-                fontWeight: 600,
-                color: "#f1f5f9",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "24px",
-                  height: "24px",
-                  borderRadius: "6px",
-                  background: "rgba(59, 130, 246, 0.15)",
-                }}
-              >
-                <Camera size={14} style={{ color: "#3b82f6" }} />
-              </div>
-              <span>Share a photo of your new friend</span>
-            </label>
-
-            {!image ? (
-              <label
-                style={{
-                  display: "block",
-                  padding: "48px 24px",
-                  background: "rgba(15, 23, 42, 0.6)",
-                  border: errors.photo
-                    ? "2px dashed #ef4444"
-                    : "2px dashed rgba(71, 85, 105, 0.5)",
-                  borderRadius: "12px",
-                  textAlign: "center",
-                  cursor: "pointer",
-                }}
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  style={{ display: "none" }}
-                />
-                <Upload size={40} style={{ color: "#64748b", marginBottom: "12px" }} />
-                <p style={{ fontSize: "16px", color: "#cbd5e1" }}>Click to upload</p>
-              </label>
-            ) : (
-              <div style={{ position: "relative", borderRadius: "12px", overflow: "hidden" }}>
-                <img
-                  src={image}
-                  alt="Uploaded pet"
-                  style={{ width: "100%", height: "300px", objectFit: "cover" }}
-                />
-                <button
-                  onClick={removeImage}
-                  type="button"
-                  style={{
-                    position: "absolute",
-                    top: "12px",
-                    right: "12px",
-                    background: "rgba(24, 24, 24, 0.9)",
-                    border: "none",
-                    borderRadius: "50%",
-                    width: "32px",
-                    height: "32px",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <X size={18} color="#fff" />
-                </button>
-              </div>
-            )}
-            {errors.photo && (
-              <p style={{ color: "#ef4444", fontSize: "13px", marginTop: "8px" }}>
-                {errors.photo}
-              </p>
-            )}
-          </div>
-
-          {/* Location */}
-          <div style={{ marginBottom: "40px" }}>
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                marginBottom: "14px",
-                fontSize: "15px",
-                fontWeight: 600,
-                color: "#f1f5f9",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "24px",
-                  height: "24px",
-                  borderRadius: "6px",
-                  background: "rgba(16, 185, 129, 0.15)",
-                }}
-              >
-                <MapPin size={14} style={{ color: "#10b981" }} />
-              </div>
-              <span>Where did you meet them?</span>
-            </label>
-
-            <GooglePlacesAutocomplete onSelect={handleSelect} error={errors.location} />
-            {errors.location && (
-              <p style={{ color: "#ef4444", fontSize: "13px", marginTop: "8px" }}>
-                {errors.location}
-              </p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "16px",
-              background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-              border: "none",
-              borderRadius: "12px",
-              color: "#fff",
-              fontSize: "17px",
-              fontWeight: 600,
-              cursor: "pointer",
-              opacity: loading ? 0.7 : 1,
-            }}
-          >
-            {loading ? "Saving..." : "Share to Care"}
-          </button>
-        </form>
-
-      </div>
-
-      {showSuccessModal && (
+      {/* ====== PAGE INNER (uses single container) ====== */}
+      <div style={{ ...CONTAINER_STYLE, paddingTop: "100px", paddingBottom: "100px" }}>
+        {/* TWO-COLUMN WRAPPER - keeps exact left/right alignment as other pages */}
         <div
           style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-            animation: "fadeIn 0.3s ease-in-out",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "80px",
+            alignItems: "start",
           }}
         >
-          <div
-            style={{
-              background: "rgba(30, 41, 59, 0.9)",
-              border: "1px solid rgba(51, 65, 85, 0.6)",
-              borderRadius: "16px",
-              padding: "30px 40px",
-              textAlign: "center",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-              backdropFilter: "blur(10px)",
-              animation: "slideUp 0.3s ease-out",
-            }}
-          >
-            <div
+          {/* LEFT - TEXT (keeps same horizontal position as other pages using CONTAINER_STYLE) */}
+          <div style={{ paddingRight: "20px" }}>
+            <h1
               style={{
-                width: "60px",
-                height: "60px",
-                margin: "0 auto 16px",
-                borderRadius: "50%",
-                background: "rgba(16, 185, 129, 0.15)",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+                fontSize: "52px",
+                color: "#fff",
+                fontFamily: "Playfair Display",
+                fontWeight: 700,
+                marginBottom: "20px",
+                lineHeight: "1.15",
+                letterSpacing: "-1px",
               }}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="#10b981"
-                stroke="none"
-                style={{ width: "34px", height: "34px" }}
-              >
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 
-           4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 
-           14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 
-           6.86-8.55 11.54L12 21.35z" />
-              </svg>
+              Report a stray,
+              <span style={{ color: "var(--gold-light)", display: "block" }}>
+                show some kindness.
+              </span>
+            </h1>
 
-            </div>
-
-            <h2
-              style={{
-                color: "#f1f5f9",
-                fontSize: "20px",
-                fontWeight: 600,
-                marginBottom: "8px",
-              }}
-            >
-              Much love!
-            </h2>
             <p
               style={{
-                color: "#94a3b8",
-                fontSize: "15px",
-                lineHeight: "1.5",
-                maxWidth: "280px",
-                margin: "0 auto",
+                fontSize: "20px",
+                lineHeight: "1.7",
+                color: "rgba(255,255,255,0.65)",
+                maxWidth: "500px",
               }}
             >
-              Look at you! Making the world a better place for furry friends.
+              Each report helps connect a stray to the right people—volunteers,
+              feeders, rescuers, and the community. Your compassion creates a path to safety.
             </p>
+
+            <p
+              style={{
+                marginTop: "30px",
+                fontSize: "17px",
+                color: "rgba(255,255,255,0.45)",
+                maxWidth: "450px",
+                lineHeight: "1.6",
+              }}
+            >
+              Share a name, a photo, and the place you last met them. That’s all it takes to make sure they’re noticed and cared for.
+            </p>
+          </div>
+
+          {/* RIGHT - FORM (small, minimal, same width fields) */}
+          <form onSubmit={handleSubmit} style={{ width: "100%", maxWidth: "420px", marginLeft: "auto", padding: "0" }}>
+            <div style={{ marginBottom: "24px" }}>
+              <label style={{ display: "block", fontSize: "15px", color: "rgba(255,255,255,0.85)", marginBottom: "8px", fontWeight: 500 }}>
+              Who’s this lovely soul?
+              </label>
+
+              <input
+                type="text"
+                value={petName}
+                placeholder="Shadow, Luna, Ranger…"
+                onChange={(e) => setPetName(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px 0",
+                  background: "transparent",
+                  border: "none",
+                  borderBottom: "1px solid rgba(255,255,255,0.18)",
+                  color: "#fff",
+                  fontSize: "15px",
+                  outline: "none",
+                  transition: "0.15s",
+                }}
+                onFocus={(e) => (e.currentTarget.style.borderBottom = "1px solid rgba(255,255,255,0.45)")}
+                onBlur={(e) => (e.currentTarget.style.borderBottom = "1px solid rgba(255,255,255,0.18)")}
+              />
+              {errors.petName && <p style={{ color: "#e04f5f", marginTop: "6px", fontSize: "12px" }}>{errors.petName}</p>}
+            </div>
+
+            <div style={{ marginBottom: "24px" }}>
+              <label style={{ display: "block", fontSize: "15px", color: "rgba(255,255,255,0.85)", marginBottom: "8px", fontWeight: 500 }}>
+              Share a photo of your new friend
+              </label>
+
+              {!image ? (
+                <label style={{ display: "block", width: "100%", padding: "32px 0", textAlign: "center", border: "1px dashed rgba(255,255,255,0.18)", borderRadius: "8px", cursor: "pointer" }}>
+                  <input type="file" onChange={handleImageUpload} style={{ display: "none" }} />
+                  <Upload size={28} color="rgba(255,255,255,0.4)" />
+                  <p style={{ marginTop: "8px", fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>Click to upload</p>
+                </label>
+              ) : (
+                <div style={{ position: "relative", borderRadius: "8px", overflow: "hidden" }}>
+                  <img src={image as string} style={{ width: "100%", height: "220px", objectFit: "cover", display: "block" }} />
+                  <button type="button" onClick={removeImage} style={{ position: "absolute", top: "10px", right: "10px", width: "28px", height: "28px", borderRadius: "50%", background: "rgba(0,0,0,0.8)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                    <X size={16} color="#fff" />
+                  </button>
+                </div>
+              )}
+
+              {errors.photo && <p style={{ color: "#e04f5f", marginTop: "6px", fontSize: "12px" }}>{errors.photo}</p>}
+            </div>
+
+            <div style={{ marginBottom: "28px" }}>
+              <label style={{ display: "block", fontSize: "15px", color: "rgba(255,255,255,0.85)", marginBottom: "8px", fontWeight: 500 }}>
+                Where did you meet them?
+              </label>
+
+              <div style={{ marginBottom: "6px" }}>
+                <GooglePlacesAutocomplete onSelect={handleSelect} error={errors.location} />
+              </div>
+
+              {errors.location && <p style={{ color: "#e04f5f", fontSize: "12px" }}>{errors.location}</p>}
+            </div>
+
+            <button
+              type="submit"
+              style={{
+                width: "100%",
+                padding: "12px 0",
+                background: "#1a1a1a",
+                color: "rgba(255,255,255,0.95)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: "8px",
+                fontSize: "15px",
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "0.15s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = "#2a2a2a";
+                (e.currentTarget as HTMLButtonElement).style.border = "1px solid rgba(255,255,255,0.2)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = "#1a1a1a";
+                (e.currentTarget as HTMLButtonElement).style.border = "1px solid rgba(255,255,255,0.12)";
+              }}
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Submit Report"}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* success modal */}
+      {showSuccessModal && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }}>
+          <div style={{ background: "rgba(30,41,59,0.95)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "14px", padding: "28px 36px", textAlign: "center" }}>
+            <div style={{ width: 56, height: 56, margin: "0 auto 12px", borderRadius: "50%", background: "rgba(207,168,92,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#fff" style={{ width: 28, height: 28 }}>
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            </div>
+
+            <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 600, marginBottom: 8 }}>Much love!</h2>
+            <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 15, lineHeight: 1.4 }}>Look at you! Making the world a better place for furry friends.</p>
           </div>
         </div>
       )}
-
-
-
     </div>
-
+    </div>
 
   );
 }
-
+  
